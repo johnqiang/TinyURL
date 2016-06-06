@@ -1,0 +1,19 @@
+{
+  "name": "TinyURL",
+  "version": "0.0.1",
+  "description": "A Tiny URL generator",
+  "scripts": {
+    "start": "node ./server/app.js"
+  },
+  "author": "Qiang Zhang <zqfly2013@gmail.com>",
+  "dependencies": {
+    "body-parser": "^1.14.2",
+    "express": "^4.13.4",
+    "mongodb": "^2.1.4"
+  },
+  "devDependencies": {
+    "babel-core": "^6.2.1",
+    "babel-preset-es2015": "^6.1.18",
+    "babelify": "^7.2.0"
+  }
+}
