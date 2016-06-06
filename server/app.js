@@ -19,16 +19,16 @@ app.get("/encode/:long_url", (request, response) => {
   let urls = mongoUtil.urls();
   urls.find({"longURL": longURL}).limit(1).next((err, doc) => {
     if(err) {
-      return response.sendStatus(400);
+      return response.json({status: 400, result: err.message});
     }
     if(doc) {
-      return response.json(config.host + '/' + doc.shortURL);
+      return response.json({status: 200, result: config.host + '/' + doc.shortURL});
     }else {
       urls.insert({"longURL": longURL, "shortURL": encode(longURL)}, (err, doc) => {
         if(err) {
-          return response.sendStatus(400);
+          return response.json({status: 400, result: err.message});
         }
-        return response.json(config.host + '/' + doc.ops[0].shortURL);
+        return response.json({status: 200, result: config.host + '/' + doc.ops[0].shortURL});
       })
     }
   })
@@ -39,12 +39,12 @@ app.get("/:short_url", (request, response) => {
   let urls = mongoUtil.urls();
   urls.find({"shortURL": shortURL}).limit(1).next((err, doc) => {
     if(err) {
-      return response.sendStatus(400);
+      return response.json({status: 400, result: err.message});
     }
     if(!doc) {
-      return response.json('URL not found!');
+      return response.json({status: 404, result: 'URL not found!'});
     }else {
-      return response.redirect('http://' + doc.longURL);
+      return response.redirect({status: 200, result: 'http://' + doc.longURL});
     }
   })
 })
