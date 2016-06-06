@@ -22,13 +22,13 @@ app.get("/encode/:long_url", (request, response) => {
       return response.sendStatus(400);
     }
     if(doc) {
-      return response.json(config.host + doc.shortURL);
+      return response.json(config.host + '/' + doc.shortURL);
     }else {
       urls.insert({"longURL": longURL, "shortURL": encode(longURL)}, (err, doc) => {
         if(err) {
           return response.sendStatus(400);
         }
-        return response.json(config.host + doc.ops[0].shortURL);
+        return response.json(config.host + '/' + doc.ops[0].shortURL);
       })
     }
   })
@@ -64,7 +64,6 @@ let encode = function(longURL) {
   {
   // get index of base64 table
       let index = 0x0000003D & hexint;
-      console.log(index);
       output += base64.charAt(index);
       //right shift five bits
       hexint = hexint >> 5;
