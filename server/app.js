@@ -12,10 +12,13 @@ mongoUtil.connect();
 app.use( express.static(__dirname + "/../client") );
 
 let bodyParser = require("body-parser");
-let jsonParser = bodyParser.json();
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
 
-app.get("/encode/:long_url", (request, response) => {
-  let longURL = request.params.long_url;
+app.post("/encode", (request, response) => {
+  let longURL = request.body.longURL;
   let urls = mongoUtil.urls();
   urls.find({"longURL": longURL}).limit(1).next((err, doc) => {
     if(err) {
@@ -35,7 +38,9 @@ app.get("/encode/:long_url", (request, response) => {
 })
 
 app.get("/:short_url", (request, response) => {
+  console.log('hi');
   let shortURL = request.params.short_url;
+  console.log(shortURL);
   let urls = mongoUtil.urls();
   urls.find({"shortURL": shortURL}).limit(1).next((err, doc) => {
     if(err) {
@@ -44,12 +49,12 @@ app.get("/:short_url", (request, response) => {
     if(!doc) {
       return response.json({status: 404, result: 'URL not found!'});
     }else {
-      return response.redirect({status: 200, result: 'http://' + doc.longURL});
+      return response.redirect(doc.longURL);
     }
   })
 })
 
-app.all('/*', function (req, res) {
+app.all('/', function (req, res) {
 	res.sendFile(path.join(__dirname, '/../client/index.html'));
 });
 
@@ -60,13 +65,12 @@ let encode = function(longURL) {
   let subHex = hex.substring(0, 8);
   let output = '';
   let hexint = 0x3FFFFFFF & parseInt(subHex, 16);
-  for (let i = 0; i < 5; i++)
-  {
-  // get index of base64 table
-      let index = 0x0000003D & hexint;
-      output += base64.charAt(index);
-      //right shift five bits
-      hexint = hexint >> 5;
+  for (let i = 0; i < 5; i++){
+    // get index of base64 table
+    let index = 0x0000003D & hexint;
+    output += base64.charAt(index);
+    //right shift five bits
+    hexint = hexint >> 5;
   }
   return output;
 }
