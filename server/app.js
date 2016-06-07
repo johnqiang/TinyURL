@@ -38,9 +38,7 @@ app.post("/encode", (request, response) => {
 })
 
 app.get("/:short_url", (request, response) => {
-  console.log('hi');
   let shortURL = request.params.short_url;
-  console.log(shortURL);
   let urls = mongoUtil.urls();
   urls.find({"shortURL": shortURL}).limit(1).next((err, doc) => {
     if(err) {
@@ -49,7 +47,12 @@ app.get("/:short_url", (request, response) => {
     if(!doc) {
       return response.json({status: 404, result: 'URL not found!'});
     }else {
-      return response.redirect(doc.longURL);
+      const pattern = /^((http|https|ftp):\/\/)/;
+      let longURL = doc.longURL;
+      if(!pattern.test(longURL)) {
+        longURL = "http://" + longURL;
+      }
+      return response.redirect(longURL);
     }
   })
 })
